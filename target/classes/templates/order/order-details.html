@@ -7,45 +7,42 @@
 <header>
     <th:block th:include="~{fragments/navbar}"></th:block>
 </header>
-
 <main class="mt-3">
-    <div class="jumbotron bg-light">
-        <div class="text-center">
-            <img th:src="${product.imageUrl}" width="200" height="200" alt="Product">
-        </div>
-        <div class="row">
-            <div class="col col-md-12 text-center mt-5">
-                <h1>Name: <span th:text="${product.name}"></span></h1>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col col-md-12 text-center mt-3">
-                <h4>Desciption: <span th:text="${product.description}"></span></h4>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col col-md-12 text-center mt-3">
-                <h4>Customer: <span th:text="${customer}"></span></h4>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col col-md-12 text-center">
-                <h4>Quantity: 2</h4>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col col-md-12 text-center">
-                <h4>Price: <span th:text="${product.price}"></span></h4>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col col-md-12 text-center">
-                <h4>Date: 27-03-2019 15:45</h4>
-            </div>
-        </div>
-    </div>
-</main>
+    <h1 class="text-center text-dark" th:text="|Order: ${order.id}|"></h1>
+    <h3 class="text-center text-dark">Product</h3>
+    <hr class="hr-2 bg-dark w-75">
+    <table class="table table-hover w-75 mx-auto">
+        <thead>
+        <tr class="row mx-auto">
+            <th class="col-md-1 text-center">#</th>
+            <th class="col-md-3 text-center">Image</th>
+            <th class="col-md-3 text-center">Name</th>
+            <th class="col-md-2 text-center">Price</th>
+            <th class="col-md-3 text-center">Description</th>
+        </tr>
+        </thead>
+        <tbody>
+        <th:block th:each="product,iter : ${order.products}" th:object="${product}">
+            <tr class="row mx-auto">
+                <th class="col-md-1 text-center" th:text="${iter.index + 1}"></th>
+                <td class="col-md-3 text-center"><img th:src="*{imageUrl}" width="70" height="70" alt="Product"></td>
+                <td class="col-md-3 text-center" th:text="*{name}"></td>
+                <td class="col-md-2 text-center" th:text="*{price}"></td>
+                <td class="col-md-2 text-center" th:text="*{description}"></td>
 
+                <!--<td class="col-md-3 text-center">-->
+                <!--<a th:href="@{/products/details/{id}(id=${product.id})}" class="btn btn-secondary font-weight-bold text-white">Details</a>-->
+                <!--<a th:href="@{/products/edit/{id}(id=${product.id})}" class="btn btn-success font-weight-bold text-white">Edit</a>-->
+                <!--<a th:href="@{/products/delete/{id}(id=${product.id})}" class="btn btn-danger font-weight-bold text-white">Delete</a>-->
+                <!--</td>-->
+            </tr>
+        </th:block>
+
+
+        </tbody>
+    </table>
+    <hr class="hr-2 bg-dark">
+</main>
 
 <footer>
     <th:block th:include="~{fragments/footer}"></th:block>

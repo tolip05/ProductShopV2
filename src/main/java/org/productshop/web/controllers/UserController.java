@@ -7,9 +7,12 @@ import org.productshop.domain.models.service.UserServiceModel;
 import org.productshop.domain.models.view.UserAllViewModel;
 import org.productshop.domain.models.view.UserProfileViewModel;
 import org.productshop.service.UserService;
+import org.productshop.web.controllers.anotation.PageTitle;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -32,6 +35,7 @@ public class UserController extends BaseController{
 
     @GetMapping("/register")
     @PreAuthorize("isAnonymous()")
+    @PageTitle("Register User")
     public ModelAndView register(){
         return super.view("register");
     }
@@ -50,6 +54,7 @@ public class UserController extends BaseController{
 
     @GetMapping("/login")
     @PreAuthorize("isAnonymous()")
+    @PageTitle("Login")
     public ModelAndView login(){
         return super.view("login");
     }
@@ -63,6 +68,7 @@ public class UserController extends BaseController{
 
     @GetMapping("/edit")
     @PreAuthorize("isAuthenticated()")
+    @PageTitle("Edit")
     public ModelAndView editProfile(Principal principal,ModelAndView modelAndView){
         modelAndView.addObject("model",this.modelMapper
                 .map(this.userService.findUserByUserName(principal.getName()), UserProfileViewModel.class));
@@ -80,6 +86,7 @@ public class UserController extends BaseController{
 
     @GetMapping("/all")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PageTitle("All Users")
     public ModelAndView allUsers(ModelAndView modelAndView){
         List<UserAllViewModel> users = this.userService.findAllUsers()
                 .stream()
@@ -112,5 +119,11 @@ public class UserController extends BaseController{
     public ModelAndView setModerator(@PathVariable String id){
         this.userService.setUserRole(id,"moderator");
         return super.redirect("/users/all");
+    }
+
+    @InitBinder
+    private void initBinder(WebDataBinder webDataBinder){
+        webDataBinder.registerCustomEditor(String.class,new StringTrimmerEditor(true));
+
     }
 }

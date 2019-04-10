@@ -4,9 +4,11 @@ import org.modelmapper.ModelMapper;
 import org.productshop.domain.entities.Category;
 import org.productshop.domain.entities.Product;
 import org.productshop.domain.models.service.ProductServiceModel;
+import org.productshop.error.ProductNotFoundException;
 import org.productshop.repositoris.ProductRepository;
 import org.productshop.validation.ProductValidationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -49,14 +51,14 @@ public class ProductServiceImpl implements ProductService{
     @Override
     public ProductServiceModel findProductById(String id) {
         Product product = this.productRepository.findById(id)
-                .orElseThrow(()-> new IllegalArgumentException("Invalid id"));
+                .orElseThrow(()-> new ProductNotFoundException("Product with the given id not found"));
         return this.modelMapper.map(product,ProductServiceModel.class);
     }
 
     @Override
     public ProductServiceModel editProduct(String id, ProductServiceModel productServiceModel) {
        Product product = this.productRepository.findById(id)
-               .orElseThrow(()-> new IllegalArgumentException());
+               .orElseThrow(()-> new ProductNotFoundException("Product with the given id not found"));
        productServiceModel.setCategories(
                this.categoryService.findAllCategories()
                .stream()
@@ -73,6 +75,22 @@ public class ProductServiceImpl implements ProductService{
 
     @Override
     public void deleteProduct(String id) {
-        this.productRepository.deleteById(id);
+        Product product = this.productRepository.findById(id)
+                .orElseThrow(()->new ProductNotFoundException("Product with the given id not found"));
+        this.productRepository.delete(product);
+    }
+
+    @Override
+    public List<ProductServiceModel> findAllByCategory(String category) {
+        return this.productRepository.findAll()
+                .stream()
+                .filter(product -> product.getCategories().stream().anyMatch(categoryStream -> categoryStream.getName().equals(category)))
+                .map(product -> this.modelMapper.map(product, ProductServiceModel.class))
+                .collect(Collectors.toList());
+    }
+
+    @Scheduled(fixedRate = 300000)
+    private void testSchedule(){
+
     }
 }

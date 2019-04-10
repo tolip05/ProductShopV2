@@ -6,9 +6,11 @@ import org.productshop.domain.models.service.CategoryServiceModel;
 import org.productshop.domain.models.service.ProductServiceModel;
 import org.productshop.domain.models.view.ProductAllViewModel;
 import org.productshop.domain.models.view.ProductDetailsViewModel;
+import org.productshop.error.ProductNotFoundException;
 import org.productshop.service.CategoryService;
 import org.productshop.service.CloudinaryService;
 import org.productshop.service.ProductService;
+import org.productshop.web.controllers.anotation.PageTitle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -39,6 +41,7 @@ public class ProductController extends BaseController {
 
     @GetMapping("/add")
     @PreAuthorize("hasRole('ROLE_MODERATOR')")
+    @PageTitle("Add Product")
     public ModelAndView addProduct() {
         return super.view("product/add-product");
     }
@@ -64,6 +67,7 @@ public class ProductController extends BaseController {
 
     @GetMapping("/all")
     @PreAuthorize("hasRole('ROLE_MODERATOR')")
+    @PageTitle("All Products")
     public ModelAndView allProducts(ModelAndView modelAndView) {
 
         modelAndView.addObject("products", this.productService
@@ -76,6 +80,7 @@ public class ProductController extends BaseController {
 
     @GetMapping("/details/{id}")
     @PreAuthorize("isAuthenticated()")
+    @PageTitle("Details Product")
     public ModelAndView detailsProduct(@PathVariable String id, ModelAndView modelAndView) {
         ProductDetailsViewModel product = this.modelMapper.map(this.productService.findProductById(id),ProductDetailsViewModel.class);
         modelAndView.addObject("product", product);
@@ -85,6 +90,7 @@ public class ProductController extends BaseController {
 
     @GetMapping("/edit/{id}")
     @PreAuthorize("hasRole('ROLE_MODERATOR')")
+    @PageTitle("Edit Product")
     public ModelAndView edit(@PathVariable String id,ModelAndView modelAndView){
        ProductServiceModel productServiceModel = this.productService.findProductById(id);
        ProductAddBindingModel model = this.modelMapper.map(productServiceModel,ProductAddBindingModel.class);
@@ -105,6 +111,7 @@ public class ProductController extends BaseController {
 
     @GetMapping("/delete/{id}")
     @PreAuthorize("hasRole('ROLE_MODERATOR')")
+    @PageTitle("Delete Product")
     public ModelAndView delete(@PathVariable String id,ModelAndView modelAndView){
         ProductServiceModel productServiceModel = this.productService.findProductById(id);
         ProductAddBindingModel model = this.modelMapper.map(productServiceModel,ProductAddBindingModel.class);
@@ -117,11 +124,20 @@ public class ProductController extends BaseController {
     }
     @PostMapping("/delete/{id}")
     @PreAuthorize("hasRole('ROLE_MODERATOR')")
+    @PageTitle("Delete")
     protected ModelAndView deleteConfirm(@PathVariable String id){
         this.productService.deleteProduct(id);
         return super.redirect("/products/all");
     }
 
+
+    @ExceptionHandler({ProductNotFoundException.class})
+    public ModelAndView handlerProductNotFound(ProductNotFoundException e){
+    ModelAndView modelAndView = new ModelAndView("error");
+    modelAndView.addObject("message",e.getMessage());
+    modelAndView.addObject("statusCode",e.getStatusCode());
+    return modelAndView;
+    }
 
 //    @GetMapping("/delete/{id}")
 //    @PreAuthorize("hasRole('ROLE_MODERATOR')")
@@ -129,4 +145,21 @@ public class ProductController extends BaseController {
 //        this.productService.deleteProduct(id);
 //        return super.redirect("/products/all");
 //    }
+
+    @GetMapping("/fetch/{category}")
+    @ResponseBody
+    @PageTitle("Fetch")
+    public List<ProductAllViewModel> fetchByCategory(@PathVariable String category) {
+        if(category.equals("all")) {
+            return this.productService.findAllProduct()
+                    .stream()
+                    .map(product -> this.modelMapper.map(product, ProductAllViewModel.class))
+                    .collect(Collectors.toList());
+        }
+
+        return this.productService.findAllByCategory(category)
+                .stream()
+                .map(product -> this.modelMapper.map(product, ProductAllViewModel.class))
+                .collect(Collectors.toList());
+    }
 }

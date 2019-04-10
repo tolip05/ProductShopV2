@@ -5,6 +5,7 @@ import org.productshop.domain.models.binding.CategoryAddBindingModel;
 import org.productshop.domain.models.service.CategoryServiceModel;
 import org.productshop.domain.models.view.CategoryViewModel;
 import org.productshop.service.CategoryService;
+import org.productshop.web.controllers.anotation.PageTitle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -28,6 +29,7 @@ public class CategoryController extends BaseController{
     }
     @GetMapping("/add")
     @PreAuthorize("hasRole('ROLE_MODERATOR')")
+    @PageTitle("Add Category")
     public ModelAndView addCategory(){
         return super.view("/category/add-category");
     }
@@ -40,6 +42,7 @@ public class CategoryController extends BaseController{
     }
     @GetMapping("/all")
     @PreAuthorize("hasRole('ROLE_MODERATOR')")
+    @PageTitle("All Categories")
     public ModelAndView allCategories(ModelAndView modelAndView){
         List<CategoryViewModel>categories = this.categoryService.findAllCategories()
                 .stream()
@@ -50,6 +53,7 @@ public class CategoryController extends BaseController{
     }
     @GetMapping("/edit/{id}")
     @PreAuthorize("hasRole('ROLE_MODERATOR')")
+    @PageTitle("Edit")
     public ModelAndView editCategory(@PathVariable String id,ModelAndView modelAndView){
         CategoryServiceModel category = this.categoryService
                 .findCategoryById(id);
@@ -67,6 +71,7 @@ public class CategoryController extends BaseController{
 
     @GetMapping("/delete/{id}")
     @PreAuthorize("hasRole('ROLE_MODERATOR')")
+    @PageTitle("Delete")
     public ModelAndView deleteCategory(@PathVariable String id,ModelAndView modelAndView){
         CategoryServiceModel category = this.categoryService
                 .findCategoryById(id);
@@ -83,6 +88,7 @@ public class CategoryController extends BaseController{
     }
     @GetMapping("fetch")
     @PreAuthorize("hasRole('ROLE_MODERATOR')")
+    @PageTitle("Home")
     @ResponseBody
     public List<CategoryViewModel> fetchCategories(){
         return this.categoryService

@@ -74,7 +74,7 @@ public class Product extends BaseEntity {
         this.categories = categories;
     }
 
-    @OneToMany(mappedBy = "product")
+    @OneToMany(mappedBy = "products")
     public List<Order> getOrders() {
         return this.orders;
     }

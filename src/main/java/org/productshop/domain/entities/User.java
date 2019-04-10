@@ -95,7 +95,7 @@ public class User extends BaseEntity implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "customer")
     public List<Order> getOrders() {
         return this.orders;
     }

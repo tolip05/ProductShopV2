@@ -28,6 +28,6 @@ public class OrdersApiController {
     @PostMapping("/submit")
     public void submitOrder(@RequestBody ProductOrderRequestModel model, Principal principal) throws Exception {
         String name = principal.getName();
-        orderService.createOrder(model.getId(),name);
+     //   orderService.createOrder(model.getId(),name);
     }
 }
